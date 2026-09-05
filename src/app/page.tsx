@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,10 +18,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PropertyCard from "@/components/property/PropertyCard";
 import PropertyCatalog from "@/components/property/PropertyCatalog";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { buildWhatsAppUrl } from "@/lib/site";
 
 export default async function HomePage() {
+  const supabase = await createClient();
+
   const { data: properties, error } = await supabase
     .from("propiedades")
     .select("*")
@@ -417,9 +421,8 @@ function Eyebrow({
 }) {
   return (
     <p
-      className={`text-xs font-extrabold uppercase tracking-[0.22em] ${
-        light ? "text-[#79C2EF]" : "text-[#0016A2]"
-      }`}
+      className={`text-xs font-extrabold uppercase tracking-[0.22em] ${light ? "text-[#79C2EF]" : "text-[#0016A2]"
+        }`}
     >
       {children}
     </p>
@@ -502,52 +505,46 @@ function ServiceCard({
 }) {
   return (
     <article
-      className={`group relative overflow-hidden rounded-[1.75rem] border p-8 transition duration-500 hover:-translate-y-1 ${
-        featured
-          ? "border-[#0016A2] bg-[#0016A2] text-white shadow-xl shadow-[#0016A2]/15"
-          : "border-slate-200 bg-[#F3F7FC] text-slate-800 hover:border-[#79C2EF]/70 hover:bg-white hover:shadow-xl"
-      }`}
+      className={`group relative overflow-hidden rounded-[1.75rem] border p-8 transition duration-500 hover:-translate-y-1 ${featured
+        ? "border-[#0016A2] bg-[#0016A2] text-white shadow-xl shadow-[#0016A2]/15"
+        : "border-slate-200 bg-[#F3F7FC] text-slate-800 hover:border-[#79C2EF]/70 hover:bg-white hover:shadow-xl"
+        }`}
     >
       <div className="flex items-center justify-between">
         <div
-          className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-            featured
-              ? "bg-white/10 text-[#79C2EF]"
-              : "bg-[#79C2EF]/25 text-[#0016A2]"
-          }`}
+          className={`flex h-12 w-12 items-center justify-center rounded-2xl ${featured
+            ? "bg-white/10 text-[#79C2EF]"
+            : "bg-[#79C2EF]/25 text-[#0016A2]"
+            }`}
         >
           {icon}
         </div>
         <span
-          className={`text-xs font-black tracking-[0.2em] ${
-            featured ? "text-white/35" : "text-slate-300"
-          }`}
+          className={`text-xs font-black tracking-[0.2em] ${featured ? "text-white/35" : "text-slate-300"
+            }`}
         >
           {number}
         </span>
       </div>
 
       <h3
-        className={`mt-8 text-2xl font-black ${
-          featured ? "text-white" : "text-[#0016A2]"
-        }`}
+        className={`mt-8 text-2xl font-black ${featured ? "text-white" : "text-[#0016A2]"
+          }`}
       >
         {title}
       </h3>
 
       <p
-        className={`mt-3 min-h-[84px] text-sm leading-7 ${
-          featured ? "text-white/70" : "text-slate-500"
-        }`}
+        className={`mt-3 min-h-[84px] text-sm leading-7 ${featured ? "text-white/70" : "text-slate-500"
+          }`}
       >
         {text}
       </p>
 
       <Link
         href={href}
-        className={`mt-7 inline-flex items-center gap-2 text-sm font-extrabold ${
-          featured ? "text-[#79C2EF]" : "text-[#0016A2]"
-        }`}
+        className={`mt-7 inline-flex items-center gap-2 text-sm font-extrabold ${featured ? "text-[#79C2EF]" : "text-[#0016A2]"
+          }`}
       >
         {action} <ArrowRight size={16} />
       </Link>
