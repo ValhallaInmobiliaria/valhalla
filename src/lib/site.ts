@@ -2,8 +2,8 @@ export const SITE = {
   name: "Valhalla Inmobiliaria",
   whatsappNumber:
     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "573008290020",
-  email: "contacto@valhallainmobiliaria.com",
-  country: "Colombia",
+  email: "valhallainmobiliariazipaquira@gmail.com",
+  country: "Zipaquirá,Cundinamarca Colombia",
   social: {
     instagram: "https://www.instagram.com/valhallainmobiliaria/",
     facebook: "https://www.facebook.com/ValhallaInmobiliaria09",
