@@ -3,7 +3,7 @@ export const SITE = {
   whatsappNumber:
     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "573008290020",
   email: "valhallainmobiliariazipaquira@gmail.com",
-  country: "Zipaquirá,Cundinamarca Colombia",
+  country: "Zipaquirá,Cundinamarca",
   social: {
     instagram: "https://www.instagram.com/valhallainmobiliaria/",
     facebook: "https://www.facebook.com/ValhallaInmobiliaria09",
