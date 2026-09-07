@@ -21,6 +21,7 @@ import PropertyCatalog from "@/components/property/PropertyCatalog";
 import { createClient } from "@/lib/supabase/server";
 import { buildWhatsAppUrl } from "@/lib/site";
 
+
 export default async function HomePage() {
   const supabase = await createClient();
 
