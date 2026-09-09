@@ -1,6 +1,6 @@
 "use client";
 import { isImageUrl } from "@/lib/media";
-
+import FacebookPublisher from "@/components/admin/FacebookPublisher";
 
 import Link from "next/link";
 import {
@@ -9,6 +9,7 @@ import {
     Pencil,
     Search,
     Trash2,
+    Megaphone,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Propiedad } from "@/types/propiedad";
@@ -26,6 +27,7 @@ export default function PropertyList({
     const [operation, setOperation] = useState("Todas");
     const [status, setStatus] = useState("Todos");
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [facebookProperty, setFacebookProperty] = useState<Propiedad | null>(null);
 
     const filtered = useMemo(() => {
         const normalized = query.trim().toLowerCase();
@@ -87,6 +89,7 @@ export default function PropertyList({
     }
 
     return (
+        <>
         <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_18px_60px_rgba(0,22,162,0.06)]">
             <div className="border-b border-slate-100 p-5 sm:p-7">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -240,6 +243,15 @@ export default function PropertyList({
 
                                     <button
                                         type="button"
+                                        onClick={() => setFacebookProperty(property)}
+                                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#0016A2]/15 bg-[#0016A2]/5 px-3.5 py-2.5 text-xs font-bold text-[#0016A2] transition hover:border-[#79C2EF] hover:bg-[#79C2EF]/15"
+                                    >
+                                        <Megaphone size={15} />
+                                        Publicar en Facebook
+                                    </button>
+
+                                    <button
+                                        type="button"
                                         disabled={deletingId === property.id}
                                         onClick={() =>
                                             deleteProperty(
@@ -261,5 +273,13 @@ export default function PropertyList({
                 </div>
             )}
         </section>
+
+        {facebookProperty && (
+            <FacebookPublisher
+                property={facebookProperty}
+                onClose={() => setFacebookProperty(null)}
+            />
+        )}
+        </>
     );
 }
