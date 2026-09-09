@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeImageUrl, sanitizeVideoUrl } from "@/lib/media";
 import { isAdminEmail } from "@/lib/admin-auth";
@@ -158,6 +158,7 @@ export async function POST(request: Request) {
         }
       );
     }
+    revalidatePath("/");
 
     return NextResponse.json({
       success: true,
@@ -235,6 +236,7 @@ export async function PUT(request: Request) {
         }
       );
     }
+    revalidatePath("/");
 
     return NextResponse.json({
       success: true,
@@ -297,7 +299,7 @@ export async function DELETE(request: Request) {
         }
       );
     }
-
+    revalidatePath("/");
     return NextResponse.json({
       success: true,
       data,

@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props) {
 
   const { data: property } = await supabase
     .from("propiedades")
-    .select("titulo, ciudad, operacion, descripcion")
+    .select("*")
     .eq("id", id)
     .single();
 
@@ -40,11 +40,54 @@ export async function generateMetadata({ params }: Props) {
     };
   }
 
+  const title = property.titulo || "Propiedad disponible";
+  const description =
+    property.descripcion ||
+    `${property.operacion || "Propiedad"} en ${property.ciudad || "Colombia"
+    }.`;
+
+  const propertyUrl = `https://valhallainmobiliaria.com/propiedades/${property.id}`;
+
+  const image =
+    property.imagen_principal &&
+      isImageUrl(property.imagen_principal)
+      ? property.imagen_principal
+      : undefined;
+
   return {
-    title: property.titulo || "Propiedad",
-    description:
-      property.descripcion ||
-      `${property.operacion || "Propiedad"} en ${property.ciudad || "Colombia"}.`,
+    title,
+    description,
+
+    openGraph: {
+      title,
+      description,
+      url: propertyUrl,
+      siteName: "Valhalla Inmobiliaria",
+      type: "website",
+      ...(image
+        ? {
+          images: [
+            {
+              url: image,
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ],
+        }
+        : {}),
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(image
+        ? {
+          images: [image],
+        }
+        : {}),
+    },
   };
 }
 
@@ -68,12 +111,35 @@ export default async function PropertyPage({ params }: Props) {
     .order("orden");
 
   const whatsappUrl = buildWhatsAppUrl(
-    `Hola, estoy interesado(a) en la propiedad "${property.titulo}"${
-      property.codigo ? `, código ${property.codigo}` : ""
+    `Hola, estoy interesado(a) en la propiedad "${property.titulo}"${property.codigo ? `, código ${property.codigo}` : ""
     }. Me gustaría recibir más información y conocer la disponibilidad para una visita.`
   );
 
   const phoneUrl = `tel:+${SITE.whatsappNumber}`;
+  const propertyUrl = `https://valhallainmobiliaria.vercel.app/propiedades/${property.id}`;
+
+  const shareMessage = [
+    `🏠 ${property.titulo || "Propiedad disponible"}`,
+    property.ciudad ? `📍 ${property.ciudad}` : "",
+    property.precio
+      ? `💰 $${Number(property.precio).toLocaleString("es-CO")}`
+      : "",
+    property.codigo ? `🔖 Código: ${property.codigo}` : "",
+    "",
+    "Conoce esta propiedad en Valhalla Inmobiliaria:",
+    `🔗 ${propertyUrl}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const shareWhatsAppUrl = `https://wa.me/?text=${encodeURIComponent(
+    shareMessage
+  )}`;
+
+  const facebookShareUrl =
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      propertyUrl
+    )}`;
   const precio = Number(property.precio || 0);
   const administracion = Number(property.administracion || 0);
 
@@ -189,6 +255,29 @@ export default async function PropertyPage({ params }: Props) {
                 <Phone size={17} />
                 Llamar a Valhalla
               </a>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <a
+                  href={shareWhatsAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3.5 text-sm font-extrabold text-white transition hover:brightness-95"
+                >
+                  <MessageCircle size={18} />
+                  WhatsApp
+                </a>
+
+                <a
+                  href={facebookShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#1877F2] px-4 py-3.5 text-sm font-extrabold text-white transition hover:brightness-95"
+                >
+                  <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white text-[13px] font-black text-[#1877F2]">
+                    f
+                  </span>
+                  Facebook
+                </a>
+              </div>
 
               <div className="mt-7 grid grid-cols-2 gap-3">
                 {features.map((feature) => (

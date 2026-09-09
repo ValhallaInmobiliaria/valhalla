@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { isImageUrl } from "@/lib/media";
@@ -8,6 +10,7 @@ import {
   CarFront,
   MapPin,
   Ruler,
+  MessageCircle,
 } from "lucide-react";
 
 interface Property {
@@ -35,6 +38,41 @@ const money = (value: number | string | null | undefined) =>
 export default function PropertyCard({ property }: PropertyCardProps) {
   const operation = String(property.operacion || "Propiedad").toUpperCase();
 
+  const propertyUrl = `/propiedades/${property.id}`;
+
+  const shareText = [
+    `🏠 ${property.titulo || "Propiedad disponible"}`,
+    property.ciudad ? `📍 ${property.ciudad}` : "",
+    property.precio
+      ? `💰 ${money(property.precio)}`
+      : "",
+    "",
+    "Conoce esta propiedad en Valhalla Inmobiliaria:",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const handleWhatsApp = () => {
+    const fullUrl = `${window.location.origin}${propertyUrl}`;
+
+    const message = `${shareText}\n🔗 ${fullUrl}`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleFacebook = () => {
+    const fullUrl = `${window.location.origin}${propertyUrl}`;
+
+    const facebookUrl =
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        fullUrl
+      )}`;
+
+    window.open(facebookUrl, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <article className="group overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_14px_45px_rgba(15,23,42,0.07)] transition duration-500 hover:-translate-y-1.5 hover:border-[#79C2EF]/60 hover:shadow-[0_24px_65px_rgba(0,22,162,0.12)]">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#e9f1f8]">
@@ -56,13 +94,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           <span className="rounded-full bg-[#0016A2] px-3.5 py-1.5 text-[10px] font-extrabold tracking-[0.16em] text-white shadow-lg">
             {operation}
           </span>
+
           <span className="rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold text-[#0016A2] shadow-lg backdrop-blur">
             VALHALLA
           </span>
         </div>
 
         <Link
-          href={`/propiedades/${property.id}`}
+          href={propertyUrl}
           className="absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-extrabold text-[#0016A2] shadow-xl transition hover:bg-[#79C2EF]"
         >
           Ver propiedad <ArrowUpRight size={15} />
@@ -85,6 +124,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             label="Área"
             value={property.area ? `${property.area} m²` : "—"}
           />
+
           <Feature
             icon={<BedDouble size={15} />}
             label="Habit."
@@ -94,11 +134,13 @@ export default function PropertyCard({ property }: PropertyCardProps) {
                 : "—"
             }
           />
+
           <Feature
             icon={<Bath size={15} />}
             label="Baños"
             value={property.banos != null ? String(property.banos) : "—"}
           />
+
           <Feature
             icon={<CarFront size={15} />}
             label="Parq."
@@ -115,16 +157,40 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
               Precio
             </p>
+
             <p className="mt-1 text-xl font-black text-[#0016A2]">
               {money(property.precio)}
             </p>
           </div>
+
           <Link
-            href={`/propiedades/${property.id}`}
+            href={propertyUrl}
             className="inline-flex items-center gap-1.5 text-sm font-extrabold text-[#0016A2] transition hover:text-[#79C2EF]"
           >
             Detalles <ArrowUpRight size={16} />
           </Link>
+        </div>
+
+        {/* COMPARTIR */}
+        <div className="mt-5 grid grid-cols-2 gap-2 border-t border-slate-100 pt-5">
+          <button
+            type="button"
+            onClick={handleWhatsApp}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-3 py-3 text-xs font-extrabold text-white transition hover:brightness-95"
+          >
+            <MessageCircle size={17} />
+            WhatsApp
+          </button>
+          <button
+            type="button"
+            onClick={handleFacebook}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1877F2] px-3 py-3 text-xs font-extrabold text-white transition hover:brightness-95"
+          >
+            <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white text-[13px] font-black text-[#1877F2]">
+              f
+            </span>
+            Facebook
+          </button>
         </div>
       </div>
     </article>
@@ -145,10 +211,14 @@ function Feature({
       <div className="flex items-center justify-center gap-1 text-[#0016A2]">
         {icon}
       </div>
+
       <p className="mt-1 text-[9px] font-bold uppercase tracking-wide text-slate-400">
         {label}
       </p>
-      <p className="mt-0.5 text-xs font-extrabold text-slate-700">{value}</p>
+
+      <p className="mt-0.5 text-xs font-extrabold text-slate-700">
+        {value}
+      </p>
     </div>
   );
 }
