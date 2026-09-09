@@ -24,6 +24,7 @@ interface Property {
   habitaciones?: number | string | null;
   banos?: number | string | null;
   parqueaderos?: number | string | null;
+  codigo?: string | null;
 }
 
 interface PropertyCardProps {
@@ -40,14 +41,20 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 
   const propertyUrl = `/propiedades/${property.id}`;
 
+  /*
+   * ============================================================
+   * COMPARTIR POR WHATSAPP
+   * ============================================================
+   *
+   * Este botón permite enviar la propiedad a otra persona.
+   */
   const shareText = [
-    `🏠 ${property.titulo || "Propiedad disponible"}`,
+    `🏠 *${property.titulo || "Propiedad disponible"}*`,
+    property.codigo ? `🔖 Código: ${property.codigo}` : "",
     property.ciudad ? `📍 ${property.ciudad}` : "",
-    property.precio
-      ? `💰 ${money(property.precio)}`
-      : "",
+    property.precio ? `💰 ${money(property.precio)}` : "",
     "",
-    "Conoce esta propiedad en Valhalla Inmobiliaria:",
+    "Conoce esta propiedad de *Valhalla Inmobiliaria*:",
   ]
     .filter(Boolean)
     .join("\n");
@@ -62,19 +69,11 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleFacebook = () => {
-    const fullUrl = `${window.location.origin}${propertyUrl}`;
-
-    const facebookUrl =
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        fullUrl
-      )}`;
-
-    window.open(facebookUrl, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <article className="group overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_14px_45px_rgba(15,23,42,0.07)] transition duration-500 hover:-translate-y-1.5 hover:border-[#79C2EF]/60 hover:shadow-[0_24px_65px_rgba(0,22,162,0.12)]">
+      {/* ======================================================
+          IMAGEN
+      ======================================================= */}
       <div className="relative aspect-[4/3] overflow-hidden bg-[#e9f1f8]">
         {isImageUrl(property.imagen_principal) ? (
           <Image
@@ -90,6 +89,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </div>
         )}
 
+        {/* ETIQUETAS */}
         <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5">
           <span className="rounded-full bg-[#0016A2] px-3.5 py-1.5 text-[10px] font-extrabold tracking-[0.16em] text-white shadow-lg">
             {operation}
@@ -100,24 +100,32 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </span>
         </div>
 
+        {/* VER PROPIEDAD */}
         <Link
           href={propertyUrl}
           className="absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-extrabold text-[#0016A2] shadow-xl transition hover:bg-[#79C2EF]"
         >
-          Ver propiedad <ArrowUpRight size={15} />
+          Ver propiedad
+          <ArrowUpRight size={15} />
         </Link>
       </div>
 
+      {/* ======================================================
+          CONTENIDO
+      ======================================================= */}
       <div className="p-6">
+        {/* UBICACIÓN */}
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
           <MapPin size={14} className="text-[#79C2EF]" />
           {property.ciudad || "Ubicación no disponible"}
         </div>
 
+        {/* TÍTULO */}
         <h3 className="mt-3 line-clamp-2 text-[21px] font-extrabold leading-tight text-[#0016A2]">
           {property.titulo || "Propiedad disponible"}
         </h3>
 
+        {/* CARACTERÍSTICAS */}
         <div className="mt-5 grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-[#F3F7FC] p-2 sm:grid-cols-4">
           <Feature
             icon={<Ruler size={15} />}
@@ -152,6 +160,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           />
         </div>
 
+        {/* PRECIO */}
         <div className="mt-6 flex items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
@@ -167,29 +176,24 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             href={propertyUrl}
             className="inline-flex items-center gap-1.5 text-sm font-extrabold text-[#0016A2] transition hover:text-[#79C2EF]"
           >
-            Detalles <ArrowUpRight size={16} />
+            Detalles
+            <ArrowUpRight size={16} />
           </Link>
         </div>
 
-        {/* COMPARTIR */}
-        <div className="mt-5 grid grid-cols-2 gap-2 border-t border-slate-100 pt-5">
+        {/* ==================================================
+            COMPARTIR
+        =================================================== */}
+        <div className="mt-5 border-t border-slate-100 pt-5">
           <button
             type="button"
             onClick={handleWhatsApp}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-3 py-3 text-xs font-extrabold text-white transition hover:brightness-95"
+            aria-label={`Compartir ${property.titulo || "propiedad"
+              } por WhatsApp`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-3 py-3 text-xs font-extrabold text-white transition hover:brightness-95"
           >
             <MessageCircle size={17} />
-            WhatsApp
-          </button>
-          <button
-            type="button"
-            onClick={handleFacebook}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1877F2] px-3 py-3 text-xs font-extrabold text-white transition hover:brightness-95"
-          >
-            <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white text-[13px] font-black text-[#1877F2]">
-              f
-            </span>
-            Facebook
+            Compartir por WhatsApp
           </button>
         </div>
       </div>

@@ -17,7 +17,12 @@ import Footer from "@/components/layout/Footer";
 import PhotoGallery from "@/components/gallery/PhotoGallery";
 import { supabase } from "@/lib/supabase";
 import { SITE, buildWhatsAppUrl } from "@/lib/site";
-import { getYouTubeEmbedUrl, imageUrls, isDirectVideoUrl, isImageUrl } from "@/lib/media";
+import {
+  getYouTubeEmbedUrl,
+  imageUrls,
+  isDirectVideoUrl,
+  isImageUrl,
+} from "@/lib/media";
 
 interface Props {
   params: Promise<{
@@ -41,16 +46,23 @@ export async function generateMetadata({ params }: Props) {
   }
 
   const title = property.titulo || "Propiedad disponible";
+
   const description =
     property.descripcion ||
     `${property.operacion || "Propiedad"} en ${property.ciudad || "Colombia"
     }.`;
 
-  const propertyUrl = `https://valhallainmobiliaria.com/propiedades/${property.id}`;
+  /*
+   * URL PÚBLICA DE LA PROPIEDAD
+   */
+  const propertyUrl = `https://valhallainmobiliaria.vercel.app/propiedades/${property.id}`;
 
+  /*
+   * IMAGEN PRINCIPAL PARA LA VISTA PREVIA
+   * DE WHATSAPP, REDES SOCIALES Y OTROS SERVICIOS.
+   */
   const image =
-    property.imagen_principal &&
-      isImageUrl(property.imagen_principal)
+    property.imagen_principal && isImageUrl(property.imagen_principal)
       ? property.imagen_principal
       : undefined;
 
@@ -58,12 +70,26 @@ export async function generateMetadata({ params }: Props) {
     title,
     description,
 
+    alternates: {
+      canonical: propertyUrl,
+    },
+
+    /*
+     * OPEN GRAPH
+     *
+     * Estos datos permiten que al compartir el enlace
+     * se pueda generar una vista previa con:
+     * - título
+     * - descripción
+     * - imagen
+     */
     openGraph: {
       title,
       description,
       url: propertyUrl,
       siteName: "Valhalla Inmobiliaria",
       type: "website",
+
       ...(image
         ? {
           images: [
@@ -82,6 +108,7 @@ export async function generateMetadata({ params }: Props) {
       card: "summary_large_image",
       title,
       description,
+
       ...(image
         ? {
           images: [image],
@@ -104,29 +131,81 @@ export default async function PropertyPage({ params }: Props) {
     notFound();
   }
 
+  /*
+   * ============================================================
+   * IMÁGENES
+   * ============================================================
+   */
   const { data: images } = await supabase
     .from("imagenes_propiedad")
     .select("*")
     .eq("propiedad_id", id)
     .order("orden");
 
-  const whatsappUrl = buildWhatsAppUrl(
-    `Hola, estoy interesado(a) en la propiedad "${property.titulo}"${property.codigo ? `, código ${property.codigo}` : ""
-    }. Me gustaría recibir más información y conocer la disponibilidad para una visita.`
-  );
-
-  const phoneUrl = `tel:+${SITE.whatsappNumber}`;
+  /*
+   * ============================================================
+   * URL PÚBLICA
+   * ============================================================
+   */
   const propertyUrl = `https://valhallainmobiliaria.vercel.app/propiedades/${property.id}`;
 
-  const shareMessage = [
-    `🏠 ${property.titulo || "Propiedad disponible"}`,
+  /*
+   * ============================================================
+   * WHATSAPP DEL ASESOR
+   * ============================================================
+   *
+   * Este botón es para contactar directamente a Valhalla.
+   *
+   * El mensaje identifica automáticamente:
+   * - propiedad
+   * - código
+   * - ciudad
+   * - precio
+   * - enlace
+   */
+  const whatsappMessage = [
+    "🏠 Hola, estoy interesado(a) en esta propiedad:",
+    "",
+    `*${property.titulo || "Propiedad disponible"}*`,
+    property.codigo ? `🔖 Código: ${property.codigo}` : "",
     property.ciudad ? `📍 ${property.ciudad}` : "",
     property.precio
       ? `💰 $${Number(property.precio).toLocaleString("es-CO")}`
       : "",
-    property.codigo ? `🔖 Código: ${property.codigo}` : "",
     "",
-    "Conoce esta propiedad en Valhalla Inmobiliaria:",
+    "Quisiera recibir más información y conocer la disponibilidad para una visita.",
+    "",
+    `🔗 ${propertyUrl}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
+
+  /*
+   * ============================================================
+   * TELÉFONO
+   * ============================================================
+   */
+  const phoneUrl = `tel:+${SITE.whatsappNumber}`;
+
+  /*
+   * ============================================================
+   * COMPARTIR POR WHATSAPP
+   * ============================================================
+   *
+   * Este botón sirve para enviar la propiedad
+   * a otra persona.
+   */
+  const shareMessage = [
+    `🏠 *${property.titulo || "Propiedad disponible"}*`,
+    property.codigo ? `🔖 Código: ${property.codigo}` : "",
+    property.ciudad ? `📍 ${property.ciudad}` : "",
+    property.precio
+      ? `💰 $${Number(property.precio).toLocaleString("es-CO")}`
+      : "",
+    "",
+    "Conoce esta propiedad de *Valhalla Inmobiliaria*:",
     `🔗 ${propertyUrl}`,
   ]
     .filter(Boolean)
@@ -136,20 +215,41 @@ export default async function PropertyPage({ params }: Props) {
     shareMessage
   )}`;
 
-  const facebookShareUrl =
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      propertyUrl
-    )}`;
+  /*
+   * ============================================================
+   * PRECIO
+   * ============================================================
+   */
   const precio = Number(property.precio || 0);
+
+  /*
+   * ============================================================
+   * ADMINISTRACIÓN
+   * ============================================================
+   */
   const administracion = Number(property.administracion || 0);
 
+  /*
+   * ============================================================
+   * GALERÍA
+   * ============================================================
+   */
   const propertyImages = [
     ...(isImageUrl(property.imagen_principal)
       ? [{ id: "principal", url: property.imagen_principal }]
       : []),
-    ...imageUrls(images ?? []),
-  ].filter((image, index, all) => all.findIndex((candidate) => candidate.url === image.url) === index);
 
+    ...imageUrls(images ?? []),
+  ].filter(
+    (image, index, all) =>
+      all.findIndex((candidate) => candidate.url === image.url) === index
+  );
+
+  /*
+   * ============================================================
+   * CARACTERÍSTICAS
+   * ============================================================
+   */
   const features = [
     {
       icon: <BedDouble size={18} />,
@@ -177,6 +277,9 @@ export default async function PropertyPage({ params }: Props) {
     <main className="min-h-screen bg-[#F3F7FC] text-slate-800">
       <Navbar />
 
+      {/* ======================================================
+          VOLVER AL CATÁLOGO
+      ======================================================= */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-[1440px] px-5 py-5 sm:px-8 lg:px-10">
           <Link
@@ -189,14 +292,20 @@ export default async function PropertyPage({ params }: Props) {
         </div>
       </section>
 
+      {/* ======================================================
+          INFORMACIÓN PRINCIPAL
+      ======================================================= */}
       <section className="bg-[#F3F7FC]">
         <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
           <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,1.3fr)_minmax(380px,0.7fr)] xl:gap-10">
+            {/* GALERÍA */}
             <div className="min-w-0">
               <PhotoGallery images={propertyImages} />
             </div>
 
+            {/* INFORMACIÓN DE LA PROPIEDAD */}
             <aside className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(0,22,162,0.08)] sm:p-8 xl:sticky xl:top-[112px]">
+              {/* OPERACIÓN / ESTADO */}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="inline-flex items-center rounded-full bg-[#0016A2] px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-white">
                   {property.operacion || "Propiedad"}
@@ -210,22 +319,30 @@ export default async function PropertyPage({ params }: Props) {
                 )}
               </div>
 
+              {/* TÍTULO */}
               <h1 className="mt-6 text-3xl font-black leading-[1.08] tracking-tight text-[#0016A2] sm:text-4xl">
                 {property.titulo || "Propiedad disponible"}
               </h1>
 
+              {/* UBICACIÓN */}
               <div className="mt-4 flex items-start gap-2 text-slate-500">
-                <MapPin className="mt-0.5 shrink-0 text-[#79C2EF]" size={19} />
+                <MapPin
+                  className="mt-0.5 shrink-0 text-[#79C2EF]"
+                  size={19}
+                />
+
                 <p className="text-sm font-medium leading-6 sm:text-base">
                   {property.ciudad || "Colombia"}
                   {property.barrio ? ` • ${property.barrio}` : ""}
                 </p>
               </div>
 
+              {/* PRECIO */}
               <div className="mt-7 rounded-2xl border border-[#79C2EF]/40 bg-[#F3F7FC] px-5 py-5">
                 <p className="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">
                   Precio
                 </p>
+
                 <p className="mt-1 text-3xl font-black tracking-tight text-[#0016A2] sm:text-4xl">
                   ${precio.toLocaleString("es-CO")}
                 </p>
@@ -238,6 +355,9 @@ export default async function PropertyPage({ params }: Props) {
                 )}
               </div>
 
+              {/* ==================================================
+                  CONSULTAR AL ASESOR
+              =================================================== */}
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -248,6 +368,7 @@ export default async function PropertyPage({ params }: Props) {
                 Consultar por WhatsApp
               </a>
 
+              {/* LLAMAR */}
               <a
                 href={phoneUrl}
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#0016A2]/15 px-5 py-3.5 text-sm font-bold text-[#0016A2] transition hover:border-[#79C2EF] hover:bg-[#79C2EF]/10"
@@ -255,30 +376,23 @@ export default async function PropertyPage({ params }: Props) {
                 <Phone size={17} />
                 Llamar a Valhalla
               </a>
-              <div className="mt-4 grid grid-cols-2 gap-3">
+
+              {/* ==================================================
+                  COMPARTIR POR WHATSAPP
+              =================================================== */}
+              <div className="mt-4">
                 <a
                   href={shareWhatsAppUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3.5 text-sm font-extrabold text-white transition hover:brightness-95"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3.5 text-sm font-extrabold text-white transition hover:brightness-95"
                 >
                   <MessageCircle size={18} />
-                  WhatsApp
-                </a>
-
-                <a
-                  href={facebookShareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-xl bg-[#1877F2] px-4 py-3.5 text-sm font-extrabold text-white transition hover:brightness-95"
-                >
-                  <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white text-[13px] font-black text-[#1877F2]">
-                    f
-                  </span>
-                  Facebook
+                  Compartir por WhatsApp
                 </a>
               </div>
 
+              {/* CARACTERÍSTICAS */}
               <div className="mt-7 grid grid-cols-2 gap-3">
                 {features.map((feature) => (
                   <Feature
@@ -290,16 +404,23 @@ export default async function PropertyPage({ params }: Props) {
                 ))}
               </div>
 
+              {/* INFORMACIÓN */}
               <div className="mt-6 border-t border-slate-200 pt-5">
                 {property.codigo && (
                   <InfoRow label="Código" value={property.codigo} />
                 )}
+
                 {property.tipo && (
                   <InfoRow label="Tipo" value={property.tipo} />
                 )}
+
                 {property.estrato != null && (
-                  <InfoRow label="Estrato" value={property.estrato} />
+                  <InfoRow
+                    label="Estrato"
+                    value={String(property.estrato)}
+                  />
                 )}
+
                 {property.direccion && (
                   <InfoRow label="Dirección" value={property.direccion} />
                 )}
@@ -309,33 +430,45 @@ export default async function PropertyPage({ params }: Props) {
         </div>
       </section>
 
+      {/* ======================================================
+          DESCRIPCIÓN E INFORMACIÓN
+      ======================================================= */}
       <section className="bg-[#F3F7FC] pb-16 lg:pb-24">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-10">
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_350px]">
+            {/* DESCRIPCIÓN */}
             <article className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm sm:p-9">
               <SectionTitle>Descripción</SectionTitle>
+
               <div className="mt-6 whitespace-pre-line text-base leading-8 text-slate-600">
                 {property.descripcion ||
                   "Esta propiedad no tiene una descripción disponible actualmente."}
               </div>
             </article>
 
+            {/* INFORMACIÓN */}
             <aside className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm">
               <SectionTitle>Información</SectionTitle>
+
               <div className="mt-6 space-y-4">
                 <InfoRow
                   label="Operación"
                   value={property.operacion || "-"}
                 />
+
                 <InfoRow label="Tipo" value={property.tipo || "-"} />
+
                 <InfoRow label="Ciudad" value={property.ciudad || "-"} />
+
                 {property.barrio && (
                   <InfoRow label="Barrio" value={property.barrio} />
                 )}
+
                 <InfoRow
                   label="Área"
                   value={`${property.area ?? 0} m²`}
                 />
+
                 {administracion > 0 && (
                   <InfoRow
                     label="Administración"
@@ -344,6 +477,7 @@ export default async function PropertyPage({ params }: Props) {
                 )}
               </div>
 
+              {/* CTA */}
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -356,6 +490,9 @@ export default async function PropertyPage({ params }: Props) {
             </aside>
           </div>
 
+          {/* ==================================================
+              VIDEO / MAPA
+          =================================================== */}
           {(property.video || property.mapa) && (
             <div className="mt-8 grid gap-8 lg:grid-cols-2">
               {property.video && (
@@ -371,7 +508,9 @@ export default async function PropertyPage({ params }: Props) {
                     </video>
                   ) : (
                     <iframe
-                      src={getYouTubeEmbedUrl(property.video) ?? property.video}
+                      src={
+                        getYouTubeEmbedUrl(property.video) ?? property.video
+                      }
                       title="Video de la propiedad"
                       className="h-full w-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -397,14 +536,19 @@ export default async function PropertyPage({ params }: Props) {
         </div>
       </section>
 
+      {/* ======================================================
+          CTA FINAL
+      ======================================================= */}
       <section className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-4xl px-5 py-16 text-center sm:px-8 lg:py-20">
           <p className="text-xs font-extrabold uppercase tracking-[0.25em] text-[#0016A2]">
             {SITE.name}
           </p>
+
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[#0016A2] sm:text-4xl">
             ¿Te interesa esta propiedad?
           </h2>
+
           <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-500">
             Comunícate con nosotros para conocer más detalles, resolver tus
             dudas o agendar una visita.
@@ -436,6 +580,10 @@ export default async function PropertyPage({ params }: Props) {
   );
 }
 
+/* ============================================================
+   FEATURE
+============================================================ */
+
 function Feature({
   icon,
   label,
@@ -448,15 +596,21 @@ function Feature({
   return (
     <div className="rounded-2xl border border-slate-200 bg-[#F3F7FC] p-3.5 transition hover:border-[#79C2EF]/60 hover:bg-white">
       <div className="text-[#0016A2]">{icon}</div>
+
       <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
         {label}
       </p>
+
       <p className="mt-1 truncate text-lg font-extrabold text-[#0016A2]">
         {value}
       </p>
     </div>
   );
 }
+
+/* ============================================================
+   INFO ROW
+============================================================ */
 
 function InfoRow({
   label,
@@ -468,12 +622,17 @@ function InfoRow({
   return (
     <div className="flex items-start justify-between gap-5 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
       <span className="text-sm text-slate-400">{label}</span>
+
       <span className="max-w-[65%] text-right text-sm font-bold text-slate-700">
         {value}
       </span>
     </div>
   );
 }
+
+/* ============================================================
+   SECTION TITLE
+============================================================ */
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -483,6 +642,10 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
     </h2>
   );
 }
+
+/* ============================================================
+   MEDIA CARD
+============================================================ */
 
 function MediaCard({
   title,
@@ -494,6 +657,7 @@ function MediaCard({
   return (
     <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
       <SectionTitle>{title}</SectionTitle>
+
       <div className="mt-5 aspect-video overflow-hidden rounded-2xl bg-slate-100">
         {children}
       </div>
