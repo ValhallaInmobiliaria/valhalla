@@ -18,8 +18,13 @@ export const metadata = {
 };
 
 export default function ContactoPage() {
-  const whatsappUrl = buildWhatsAppUrl(
-    "Hola, Valhalla Inmobiliaria. Quiero recibir información y asesoría."
+  const ventasWhatsAppUrl = buildWhatsAppUrl(
+    "Hola, Valhalla Inmobiliaria. Quiero recibir información sobre ventas y propiedades para comprar.",
+    "ventas"
+  );
+  const arriendosWhatsAppUrl = buildWhatsAppUrl(
+    "Hola, Valhalla Inmobiliaria. Quiero recibir información sobre arriendos.",
+    "arriendos"
   );
 
   return (
@@ -73,26 +78,46 @@ export default function ContactoPage() {
               WhatsApp.
             </p>
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-[#0016A2] px-6 py-4 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#79C2EF] hover:text-[#0016A2]"
-            >
-              <MessageCircle size={19} />
-              Hablar por WhatsApp
-              <ArrowUpRight size={16} />
-            </a>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href={ventasWhatsAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0016A2] px-6 py-4 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#79C2EF] hover:text-[#0016A2]"
+              >
+                <MessageCircle size={19} />
+                WhatsApp Ventas
+                <ArrowUpRight size={16} />
+              </a>
+              <a
+                href={arriendosWhatsAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#0016A2]/15 bg-white px-6 py-4 text-sm font-extrabold text-[#0016A2] transition hover:border-[#79C2EF] hover:bg-[#F3F7FC]"
+              >
+                <MessageCircle size={19} />
+                WhatsApp Arriendos
+                <ArrowUpRight size={16} />
+              </a>
+            </div>
           </div>
 
           {/* DATOS DE CONTACTO */}
           <div className="space-y-4">
             <ContactCard
               icon={<MessageCircle size={20} />}
-              title="WhatsApp"
-              description="Escríbenos directamente."
-              href={whatsappUrl}
-              label="Abrir WhatsApp"
+              title="WhatsApp Ventas"
+              description="Compra una propiedad o consulta inmuebles en venta."
+              href={ventasWhatsAppUrl}
+              label="Abrir WhatsApp Ventas"
+            />
+
+            <ContactCard
+              icon={<MessageCircle size={20} />}
+              title="WhatsApp Arriendos"
+              description="Encuentra una propiedad para arrendar."
+              href={arriendosWhatsAppUrl}
+              label="Abrir WhatsApp Arriendos"
             />
 
             <ContactCard
@@ -181,7 +206,7 @@ export default function ContactoPage() {
             </div>
 
             <a
-              href={whatsappUrl}
+              href={ventasWhatsAppUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#0016A2] px-6 py-4 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-white hover:text-[#0016A2]"

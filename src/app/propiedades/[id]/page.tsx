@@ -16,7 +16,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PhotoGallery from "@/components/gallery/PhotoGallery";
 import { supabase } from "@/lib/supabase";
-import { SITE, buildWhatsAppUrl } from "@/lib/site";
+import { SITE, buildWhatsAppUrl, getWhatsAppNumber } from "@/lib/site";
+import { isForRent } from "@/lib/property-operation";
 import {
   getYouTubeEmbedUrl,
   imageUrls,
@@ -27,6 +28,9 @@ import {
 interface Props {
   params: Promise<{
     id: string;
+  }>;
+  searchParams?: Promise<{
+    canal?: string | string[];
   }>;
 }
 
@@ -118,8 +122,10 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default async function PropertyPage({ params }: Props) {
+export default async function PropertyPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const query = searchParams ? await searchParams : {};
+  const requestedChannel = Array.isArray(query.canal) ? query.canal[0] : query.canal;
 
   const { data: property, error: propertyError } = await supabase
     .from("propiedades")
@@ -179,14 +185,20 @@ export default async function PropertyPage({ params }: Props) {
     .filter(Boolean)
     .join("\n");
 
-  const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
+  const whatsappChannel =
+    requestedChannel === "arriendos" || requestedChannel === "ventas"
+      ? requestedChannel
+      : isForRent(property.operacion)
+        ? "arriendos"
+        : "ventas";
+  const whatsappUrl = buildWhatsAppUrl(whatsappMessage, whatsappChannel);
 
   /*
    * ============================================================
    * TELÉFONO
    * ============================================================
    */
-  const phoneUrl = `tel:+${SITE.whatsappNumber}`;
+  const phoneUrl = `tel:+${getWhatsAppNumber(whatsappChannel)}`;
 
   /*
    * ============================================================

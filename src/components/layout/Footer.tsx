@@ -19,8 +19,13 @@ const navigation = [
 ];
 
 export default function Footer() {
-  const whatsappUrl = buildWhatsAppUrl(
-    "Hola, Valhalla Inmobiliaria. Quiero recibir información sobre sus servicios."
+  const ventasWhatsAppUrl = buildWhatsAppUrl(
+    "Hola, Valhalla Inmobiliaria. Quiero información sobre ventas.",
+    "ventas"
+  );
+  const arriendosWhatsAppUrl = buildWhatsAppUrl(
+    "Hola, Valhalla Inmobiliaria. Quiero información sobre arriendos.",
+    "arriendos"
   );
 
   return (
@@ -51,7 +56,7 @@ export default function Footer() {
 
             <div className="mt-7 space-y-3">
               <a
-                href={whatsappUrl}
+                href={ventasWhatsAppUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-sm text-white/80 transition hover:text-white"
@@ -59,7 +64,19 @@ export default function Footer() {
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
                   <MessageCircle size={17} />
                 </span>
-                WhatsApp
+                WhatsApp Ventas
+              </a>
+
+              <a
+                href={arriendosWhatsAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-sm text-white/80 transition hover:text-white"
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
+                  <MessageCircle size={17} />
+                </span>
+                WhatsApp Arriendos
               </a>
 
               <a
@@ -124,16 +141,28 @@ export default function Footer() {
               propiedad.
             </p>
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[#79C2EF] px-5 py-3.5 text-sm font-bold text-[#0016A2] shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-xl"
-            >
-              <MessageCircle size={18} />
-              Hablar por WhatsApp
-              <ArrowUpRight size={16} />
-            </a>
+            <div className="mt-7 flex flex-col gap-2 sm:flex-row">
+              <a
+                href={ventasWhatsAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#79C2EF] px-4 py-3.5 text-sm font-bold text-[#0016A2] shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-xl"
+              >
+                <MessageCircle size={18} />
+                Ventas
+                <ArrowUpRight size={16} />
+              </a>
+              <a
+                href={arriendosWhatsAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-3.5 text-sm font-bold text-white transition-all duration-200 hover:bg-white hover:text-[#0016A2]"
+              >
+                <MessageCircle size={18} />
+                Arriendos
+                <ArrowUpRight size={16} />
+              </a>
+            </div>
           </div>
         </div>
 

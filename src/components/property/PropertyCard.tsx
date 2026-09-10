@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { isImageUrl } from "@/lib/media";
+import { isForRent, isForSale, operationLabel } from "@/lib/property-operation";
+import { buildWhatsAppUrl, type WhatsAppChannel } from "@/lib/site";
 import {
   ArrowUpRight,
   Bath,
@@ -29,6 +31,7 @@ interface Property {
 
 interface PropertyCardProps {
   property: Property;
+  whatsappChannel?: WhatsAppChannel;
 }
 
 const money = (value: number | string | null | undefined) =>
@@ -36,10 +39,18 @@ const money = (value: number | string | null | undefined) =>
     ? `$${Number(value).toLocaleString("es-CO")}`
     : "Consultar precio";
 
-export default function PropertyCard({ property }: PropertyCardProps) {
-  const operation = String(property.operacion || "Propiedad").toUpperCase();
+export default function PropertyCard({
+  property,
+  whatsappChannel: preferredChannel,
+}: PropertyCardProps) {
+  const operation = operationLabel(property.operacion);
+  const whatsappChannel: WhatsAppChannel =
+    preferredChannel ??
+    (isForRent(property.operacion) && !isForSale(property.operacion)
+      ? "arriendos"
+      : "ventas");
 
-  const propertyUrl = `/propiedades/${property.id}`;
+  const propertyUrl = `/propiedades/${property.id}?canal=${whatsappChannel}`;
 
   /*
    * ============================================================
@@ -181,18 +192,40 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </div>
 
         {/* ==================================================
-            COMPARTIR
+            WHATSAPP
         =================================================== */}
-        <div className="mt-5 border-t border-slate-100 pt-5">
-          <button
-            type="button"
-            onClick={handleWhatsApp}
-            aria-label={`Compartir ${property.titulo || "propiedad"
-              } por WhatsApp`}
+        <div className="mt-5 grid gap-2 border-t border-slate-100 pt-5 sm:grid-cols-2">
+          <a
+            href={buildWhatsAppUrl(
+              `Hola, Valhalla Inmobiliaria. Estoy interesado(a) en la propiedad *${
+                property.titulo || "Propiedad disponible"
+              }*.
+
+${property.ciudad ? `📍 ${property.ciudad}` : ""}
+${property.precio ? `💰 ${money(property.precio)}` : ""}
+
+Quisiera recibir más información y conocer la disponibilidad.`,
+              whatsappChannel
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Contactar por WhatsApp sobre ${
+              property.titulo || "propiedad"
+            }`}
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-3 py-3 text-xs font-extrabold text-white transition hover:brightness-95"
           >
             <MessageCircle size={17} />
-            Compartir por WhatsApp
+            {whatsappChannel === "arriendos" ? "Consultar arriendo" : "Consultar venta"}
+          </a>
+
+          <button
+            type="button"
+            onClick={handleWhatsApp}
+            aria-label={`Compartir ${property.titulo || "propiedad"} por WhatsApp`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#25D366]/30 bg-white px-3 py-3 text-xs font-extrabold text-[#128C4A] transition hover:bg-[#25D366]/10"
+          >
+            <MessageCircle size={17} />
+            Compartir
           </button>
         </div>
       </div>

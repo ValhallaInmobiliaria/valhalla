@@ -23,8 +23,13 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const whatsappUrl = buildWhatsAppUrl(
-    "Hola, Valhalla Inmobiliaria. Quiero recibir información sobre sus propiedades."
+  const ventasWhatsAppUrl = buildWhatsAppUrl(
+    "Hola, Valhalla Inmobiliaria. Quiero recibir información sobre propiedades en venta.",
+    "ventas"
+  );
+  const arriendosWhatsAppUrl = buildWhatsAppUrl(
+    "Hola, Valhalla Inmobiliaria. Quiero recibir información sobre propiedades en arriendo.",
+    "arriendos"
   );
 
   useEffect(() => {
@@ -93,15 +98,24 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden lg:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <a
-            href={whatsappUrl}
+            href={ventasWhatsAppUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-[#0016A2] px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#0016A2]/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#79C2EF] hover:text-[#0016A2] hover:shadow-xl"
+            className="inline-flex items-center gap-2 rounded-full border border-[#0016A2]/15 bg-white px-4 py-3 text-xs font-extrabold text-[#0016A2] transition hover:border-[#79C2EF] hover:bg-[#F3F7FC]"
+          >
+            <MessageCircle size={17} />
+            Ventas
+          </a>
+          <a
+            href={arriendosWhatsAppUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#0016A2] px-5 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#0016A2]/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#79C2EF] hover:text-[#0016A2] hover:shadow-xl"
           >
             <MessageCircle size={19} strokeWidth={2.2} />
-            WhatsApp
+            Arriendos
             <ChevronRight
               size={16}
               className="transition-transform group-hover:translate-x-0.5"
@@ -142,16 +156,28 @@ export default function Navbar() {
             </Link>
           ))}
 
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setIsOpen(false)}
-            className="mt-5 flex items-center justify-center gap-2 rounded-full bg-[#0016A2] px-5 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:bg-[#79C2EF] hover:text-[#0016A2]"
-          >
-            <MessageCircle size={19} />
-            Hablar por WhatsApp
-          </a>
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            <a
+              href={ventasWhatsAppUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-center gap-2 rounded-full border border-[#0016A2]/15 bg-white px-4 py-3.5 text-sm font-extrabold text-[#0016A2] shadow-sm transition hover:bg-[#F3F7FC]"
+            >
+              <MessageCircle size={18} />
+              Ventas
+            </a>
+            <a
+              href={arriendosWhatsAppUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-center gap-2 rounded-full bg-[#0016A2] px-4 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:bg-[#79C2EF] hover:text-[#0016A2]"
+            >
+              <MessageCircle size={18} />
+              Arriendos
+            </a>
+          </div>
         </nav>
       </div>
     </header>

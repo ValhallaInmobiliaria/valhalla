@@ -1,7 +1,17 @@
 export const SITE = {
   name: "Valhalla Inmobiliaria",
-  whatsappNumber:
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "573008290020",
+
+  // Puedes usar el mismo número temporalmente en ambos canales.
+  // En producción se recomienda definirlos por separado en .env.local / Vercel.
+  whatsappVentas:
+    process.env.NEXT_PUBLIC_WHATSAPP_VENTAS ||
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
+    "573102897401",
+  whatsappArriendos:
+    process.env.NEXT_PUBLIC_WHATSAPP_ARRIENDOS ||
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
+    "573102897401",
+
   email: "valhallainmobiliariazipaquira@gmail.com",
   country: "Zipaquirá,Cundinamarca",
   social: {
@@ -16,6 +26,19 @@ export const SITE = {
   },
 } as const;
 
-export function buildWhatsAppUrl(message: string) {
-  return `https://wa.me/${SITE.whatsappNumber}?text=${encodeURIComponent(message)}`;
+export type WhatsAppChannel = "ventas" | "arriendos";
+
+export function getWhatsAppNumber(channel: WhatsAppChannel): string {
+  return channel === "arriendos"
+    ? SITE.whatsappArriendos
+    : SITE.whatsappVentas;
+}
+
+export function buildWhatsAppUrl(
+  message: string,
+  channel: WhatsAppChannel = "ventas"
+) {
+  return `https://wa.me/${getWhatsAppNumber(channel)}?text=${encodeURIComponent(
+    message
+  )}`;
 }

@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PropertyCatalog from "@/components/property/PropertyCatalog";
 import { supabase } from "@/lib/supabase";
+import { isForSale } from "@/lib/property-operation";
 
 export const metadata = {
   title: "Comprar propiedades",
@@ -22,6 +23,12 @@ export default async function ComprarPage() {
   if (error) {
     console.error("Error cargando propiedades:", error);
   }
+
+  // Solo pasan al catálogo las propiedades publicadas que aplican a venta.
+  // "Venta y Arriendo" aparece también aquí.
+  const saleProperties = (properties ?? []).filter((property) =>
+    isForSale(property.operacion)
+  );
 
   return (
     <main className="min-h-screen bg-[#F3F7FC]">
@@ -54,7 +61,7 @@ export default async function ComprarPage() {
 
       <section className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-10 lg:py-20">
         <PropertyCatalog
-          properties={properties ?? []}
+          properties={saleProperties}
           initialOperation="venta"
         />
 

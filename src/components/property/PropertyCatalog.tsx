@@ -5,6 +5,8 @@ import PropertyCard from "@/components/property/PropertyCard";
 import CatalogFilters, {
   CatalogFiltersState,
 } from "@/components/home/CatalogFilters";
+import { isForRent, isForSale, normalizeOperation } from "@/lib/property-operation";
+import type { WhatsAppChannel } from "@/lib/site";
 
 interface Property {
   id: string;
@@ -65,6 +67,11 @@ export default function PropertyCatalog({
     setFilters(buildInitialFilters(initialOperation));
   };
 
+  const whatsappChannel: WhatsAppChannel =
+    normalizeOperation(initialOperation) === "arriendo"
+      ? "arriendos"
+      : "ventas";
+
   const filteredProperties = useMemo(() => {
     return properties.filter((property) => {
       const search = filters.search.trim().toLowerCase();
@@ -89,12 +96,21 @@ export default function PropertyCatalog({
       }
 
       if (filters.operacion) {
-        const operacion = String(property.operacion ?? "")
-          .trim()
-          .toLowerCase();
+        const operacion = normalizeOperation(property.operacion);
+        const filtro = normalizeOperation(filters.operacion);
 
-        if (!operacion.includes(filters.operacion.toLowerCase())) {
+        if (filtro === "venta" && !isForSale(operacion)) {
           return false;
+        }
+
+        if (filtro === "arriendo" && !isForRent(operacion)) {
+          return false;
+        }
+
+        if (filtro === "venta y arriendo") {
+          if (operacion !== "venta y arriendo") {
+            return false;
+          }
         }
       }
 
@@ -155,7 +171,7 @@ export default function PropertyCatalog({
       {filteredProperties.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filteredProperties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard key={property.id} property={property} whatsappChannel={whatsappChannel} />
           ))}
         </div>
       ) : (
