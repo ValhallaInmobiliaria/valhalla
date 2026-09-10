@@ -167,7 +167,6 @@ export default async function PropertyPage({ params }: Props) {
     "🏠 Hola, estoy interesado(a) en esta propiedad:",
     "",
     `*${property.titulo || "Propiedad disponible"}*`,
-    property.codigo ? `🔖 Código: ${property.codigo}` : "",
     property.ciudad ? `📍 ${property.ciudad}` : "",
     property.precio
       ? `💰 $${Number(property.precio).toLocaleString("es-CO")}`

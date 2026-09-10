@@ -50,7 +50,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
    */
   const shareText = [
     `🏠 *${property.titulo || "Propiedad disponible"}*`,
-    property.codigo ? `🔖 Código: ${property.codigo}` : "",
     property.ciudad ? `📍 ${property.ciudad}` : "",
     property.precio ? `💰 ${money(property.precio)}` : "",
     "",
