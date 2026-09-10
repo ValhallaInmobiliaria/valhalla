@@ -4,7 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { isImageUrl } from "@/lib/media";
 import { isForRent, isForSale, operationLabel } from "@/lib/property-operation";
-import { buildWhatsAppUrl, type WhatsAppChannel } from "@/lib/site";
+import {
+  buildWhatsAppUrl,
+  getPublicPropertyUrl,
+  type WhatsAppChannel,
+} from "@/lib/site";
 import {
   ArrowUpRight,
   Bath,
@@ -50,7 +54,8 @@ export default function PropertyCard({
       ? "arriendos"
       : "ventas");
 
-  const propertyUrl = `/propiedades/${property.id}?canal=${whatsappChannel}`;
+  const propertyPath = `/propiedades/${property.id}?canal=${whatsappChannel}`;
+  const publicPropertyUrl = getPublicPropertyUrl(property.id, whatsappChannel);
 
   /*
    * ============================================================
@@ -65,14 +70,13 @@ export default function PropertyCard({
     property.precio ? `💰 ${money(property.precio)}` : "",
     "",
     "Conoce esta propiedad de *Valhalla Inmobiliaria*:",
+    `🔗 ${publicPropertyUrl}`,
   ]
     .filter(Boolean)
     .join("\n");
 
   const handleWhatsApp = () => {
-    const fullUrl = `${window.location.origin}${propertyUrl}`;
-
-    const message = `${shareText}\n🔗 ${fullUrl}`;
+    const message = shareText;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
 
@@ -112,7 +116,7 @@ export default function PropertyCard({
 
         {/* VER PROPIEDAD */}
         <Link
-          href={propertyUrl}
+          href={propertyPath}
           className="absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-extrabold text-[#0016A2] shadow-xl transition hover:bg-[#79C2EF]"
         >
           Ver propiedad
@@ -183,7 +187,7 @@ export default function PropertyCard({
           </div>
 
           <Link
-            href={propertyUrl}
+            href={propertyPath}
             className="inline-flex items-center gap-1.5 text-sm font-extrabold text-[#0016A2] transition hover:text-[#79C2EF]"
           >
             Detalles

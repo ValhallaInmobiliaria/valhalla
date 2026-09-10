@@ -67,10 +67,25 @@ export default function PropertyCatalog({
     setFilters(buildInitialFilters(initialOperation));
   };
 
-  const whatsappChannel: WhatsAppChannel =
-    normalizeOperation(initialOperation) === "arriendo"
-      ? "arriendos"
-      : "ventas";
+  // El catálogo general (/propiedades) no debe forzar "ventas".
+  // Cada tarjeta decide su canal según su propia operación.
+  // En /comprar y /arrendar sí respetamos el contexto de la página/filtro.
+  const catalogChannel: WhatsAppChannel | undefined = (() => {
+    const context = normalizeOperation(filters.operacion || initialOperation);
+
+    if (context === "arriendo") return "arriendos";
+    if (context === "venta") return "ventas";
+
+    // Si estamos en una página específica y el filtro es "Venta y Arriendo",
+    // conservamos el canal de esa página.
+    const initial = normalizeOperation(initialOperation);
+    if (initial === "arriendo") return "arriendos";
+    if (initial === "venta") return "ventas";
+
+    // En el catálogo general, no pasar canal permite que PropertyCard
+    // determine ventas/arriendos a partir de property.operacion.
+    return undefined;
+  })();
 
   const filteredProperties = useMemo(() => {
     return properties.filter((property) => {
@@ -171,7 +186,11 @@ export default function PropertyCatalog({
       {filteredProperties.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filteredProperties.map((property) => (
-            <PropertyCard key={property.id} property={property} whatsappChannel={whatsappChannel} />
+            <PropertyCard
+              key={property.id}
+              property={property}
+              {...(catalogChannel ? { whatsappChannel: catalogChannel } : {})}
+            />
           ))}
         </div>
       ) : (

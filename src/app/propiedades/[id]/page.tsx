@@ -16,7 +16,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PhotoGallery from "@/components/gallery/PhotoGallery";
 import { supabase } from "@/lib/supabase";
-import { SITE, buildWhatsAppUrl, getWhatsAppNumber } from "@/lib/site";
+import {
+  SITE,
+  buildWhatsAppUrl,
+  getPublicPropertyUrl,
+  getWhatsAppNumber,
+} from "@/lib/site";
 import { isForRent } from "@/lib/property-operation";
 import {
   getYouTubeEmbedUrl,
@@ -59,7 +64,7 @@ export async function generateMetadata({ params }: Props) {
   /*
    * URL PÚBLICA DE LA PROPIEDAD
    */
-  const propertyUrl = `https://valhallainmobiliaria.vercel.app/propiedades/${property.id}`;
+  const propertyUrl = getPublicPropertyUrl(property.id);
 
   /*
    * IMAGEN PRINCIPAL PARA LA VISTA PREVIA
@@ -153,7 +158,7 @@ export default async function PropertyPage({ params, searchParams }: Props) {
    * URL PÚBLICA
    * ============================================================
    */
-  const propertyUrl = `https://valhallainmobiliaria.vercel.app/propiedades/${property.id}`;
+  const propertyUrl = getPublicPropertyUrl(property.id);
 
   /*
    * ============================================================
@@ -191,7 +196,15 @@ export default async function PropertyPage({ params, searchParams }: Props) {
       : isForRent(property.operacion)
         ? "arriendos"
         : "ventas";
-  const whatsappUrl = buildWhatsAppUrl(whatsappMessage, whatsappChannel);
+  const propertyContactUrl = getPublicPropertyUrl(property.id, whatsappChannel);
+  const whatsappMessageWithChannel = whatsappMessage.replace(
+    propertyUrl,
+    propertyContactUrl
+  );
+  const whatsappUrl = buildWhatsAppUrl(
+    whatsappMessageWithChannel,
+    whatsappChannel
+  );
 
   /*
    * ============================================================

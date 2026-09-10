@@ -1,5 +1,8 @@
 export const SITE = {
   name: "Valhalla Inmobiliaria",
+  publicUrl:
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://valhallainmobiliaria.vercel.app",
 
   // Puedes usar el mismo número temporalmente en ambos canales.
   // En producción se recomienda definirlos por separado en .env.local / Vercel.
@@ -32,6 +35,11 @@ export function getWhatsAppNumber(channel: WhatsAppChannel): string {
   return channel === "arriendos"
     ? SITE.whatsappArriendos
     : SITE.whatsappVentas;
+}
+
+export function getPublicPropertyUrl(id: string, channel?: WhatsAppChannel): string {
+  const base = `${SITE.publicUrl}/propiedades/${id}`;
+  return channel ? `${base}?canal=${channel}` : base;
 }
 
 export function buildWhatsAppUrl(
