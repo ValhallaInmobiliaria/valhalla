@@ -199,7 +199,6 @@ export default async function PropertyPage({ params }: Props) {
    */
   const shareMessage = [
     `🏠 *${property.titulo || "Propiedad disponible"}*`,
-    property.codigo ? `🔖 Código: ${property.codigo}` : "",
     property.ciudad ? `📍 ${property.ciudad}` : "",
     property.precio
       ? `💰 $${Number(property.precio).toLocaleString("es-CO")}`
