@@ -201,21 +201,19 @@ export default function PropertyCard({
         <div className="mt-5 grid gap-2 border-t border-slate-100 pt-5 sm:grid-cols-2">
           <a
             href={buildWhatsAppUrl(
-              `Hola, Valhalla Inmobiliaria. Estoy interesado(a) en la propiedad *${
-                property.titulo || "Propiedad disponible"
+              `Hola, Valhalla Inmobiliaria. Estoy interesado(a) en la propiedad *${property.titulo || "Propiedad disponible"
               }*.
 
-${property.ciudad ? `📍 ${property.ciudad}` : ""}
-${property.precio ? `💰 ${money(property.precio)}` : ""}
+              ${property.ciudad ? `📍 ${property.ciudad}` : ""}
+              ${property.precio ? `💰 ${money(property.precio)}` : ""}
 
-Quisiera recibir más información y conocer la disponibilidad.`,
+              Quisiera recibir más información y conocer la disponibilidad.`,
               whatsappChannel
             )}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Contactar por WhatsApp sobre ${
-              property.titulo || "propiedad"
-            }`}
+            aria-label={`Contactar por WhatsApp sobre ${property.titulo || "propiedad"
+              }`}
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-3 py-3 text-xs font-extrabold text-white transition hover:brightness-95"
           >
             <MessageCircle size={17} />
