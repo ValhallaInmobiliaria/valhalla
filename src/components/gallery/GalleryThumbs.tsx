@@ -171,6 +171,7 @@ export default function GalleryThumbs({
                             src={photo.url}
                             alt={`Miniatura ${index + 1}`}
                             fill
+                            unoptimized
                             sizes="128px"
                             draggable={false}
                             className={`

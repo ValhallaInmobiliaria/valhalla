@@ -493,6 +493,7 @@ export default function GalleryViewer({
                     src={image.url}
                     alt={`Imagen ${current + 1}`}
                     fill
+                    unoptimized
                     priority
                     sizes="90vw"
                     draggable={false}

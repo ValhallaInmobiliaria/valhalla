@@ -103,6 +103,7 @@ export default function PhotoGallery({
                     src={active.url}
                     alt={`Imagen ${current + 1}`}
                     fill
+                    unoptimized
                     priority
                     loading="eager"
                     sizes="
