@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PropertyCatalog from "@/components/property/PropertyCatalog";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { isForRent } from "@/lib/property-operation";
 
 export const metadata = {
@@ -12,8 +12,13 @@ export const metadata = {
   description:
     "Encuentra propiedades disponibles para arrendar en Valhalla Inmobiliaria.",
 };
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+
 
 export default async function ArrendarPage() {
+  const supabase = await createClient();
   const { data: properties, error } = await supabase
     .from("propiedades")
     .select("*")
