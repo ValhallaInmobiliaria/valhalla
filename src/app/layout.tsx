@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     "apartamentos en venta",
   ],
 
+  icons: {
+    icon: "/favicon.ico",
+  },
+
   robots: {
     index: true,
     follow: true,
