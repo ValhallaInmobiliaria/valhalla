@@ -16,7 +16,7 @@ export const SITE = {
     "573102897401",
 
   email: "valhallainmobiliariazipaquira@gmail.com",
-  country: "Zipaquirá,Cundinamarca",
+  country: "CALLE 25 N° 13-13 Zipaquirá,Cundinamarca",
   social: {
     instagram: "https://www.instagram.com/valhallainmobiliaria/",
     facebook: "https://www.facebook.com/ValhallaInmobiliaria09",
