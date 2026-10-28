@@ -76,11 +76,12 @@ export async function generateMetadata({ params }: Props) {
       : undefined;
 
   return {
-    title,
-    description,
-
+    title: property.titulo || "Propiedad | Valhalla Inmobiliaria",
+    description:
+      property.descripcion ||
+      `${property.operacion || "Propiedad"} en ${property.ciudad || "Colombia"}.`,
     alternates: {
-      canonical: propertyUrl,
+      canonical: `https://valhallainmobiliaria.vercel.app/propiedades/${id}`,
     },
 
     /*
