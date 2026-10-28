@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
 
   description:
     "Valhalla Inmobiliaria ofrece servicios de compra, venta y arriendo de casas, apartamentos y propiedades.",
+
+  alternates: {
+    canonical: "https://valhallainmobiliaria.vercel.app/",
+  },
 
   keywords: [
     "Valhalla Inmobiliaria",
@@ -34,7 +39,7 @@ export const metadata: Metadata = {
     title: "Valhalla Inmobiliaria",
     description:
       "Compra, venta y arriendo de propiedades con Valhalla Inmobiliaria.",
-    url: "https://valhallainmobiliaria.vercel.app",
+    url: "https://valhallainmobiliaria.vercel.app/",
     siteName: "Valhalla Inmobiliaria",
     locale: "es_CO",
     type: "website",
